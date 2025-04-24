@@ -81,17 +81,6 @@ function abrirAlertSavedText() {
       }, 7000);
 }
 
-async function gerarRelatorio() {
-    try {
-        const resposta = await fetch("http://127.0.0.1:5000/gerar_relatorio");
-        const dados = await resposta.json();
-        alert(dados.mensagem);
-    } catch (erro) {
-        console.error("Erro ao gerar relatório:", erro);
-        alert("Erro ao gerar relatório.");
-    }
-}
-
   // Função para fechar o popup
 function fecharAlertSavedText() {
     const alerta = document.querySelector('.alert_savedText');
@@ -104,16 +93,82 @@ function fecharAlertSavedText() {
     }, 500); 
 }
 
+function carregarGraficoSentimentos() {
+    fetch('http://127.0.0.1:5000/grafico')
+        .then(async res => {
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`Erro ${res.status}: ${text}`);
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (data.image_base64) {
+                document.getElementById('grafico').src = `data:image/png;base64,${data.image_base64}`;
+            } else {
+                console.warn("Imagem não recebida do backend.");
+            }
+        })
+        .catch(err => {
+            console.error("Erro ao carregar gráfico:", err.message);
+        });
+
+    const imagem = document.querySelector('.imagem_spam');
+    imagem.style.display = 'flex';
+}
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const imagemSpam = document.querySelector('.imagem_spam');
+
+    if (imagemSpam) {
+        imagemSpam.addEventListener('click', function (event) {
+            // Verifica se o clique foi fora da imagem
+            if (event.target === imagemSpam) {
+                imagemSpam.style.display = 'none'; // Fecha a imagem
+            }
+        });
+    }
+});
+
+function exportarParaExcel() {
+    fetch("http://127.0.0.1:5000/exportar_excel", {
+        method: "GET",
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro ao exportar dados');
+        }
+        return response.blob(); // Recebe o arquivo
+    })
+    .then(blob => {
+        // Cria um link temporário para baixar o arquivo
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = "dados_sentimentos.xlsx";  // Nome do arquivo para download
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    })
+    .catch(error => {
+        console.error("Erro ao tentar exportar o Excel:", error);
+    });
+}
+
 async function salvarFeedback(event) {
     event.preventDefault();
     const texto = document.getElementById("campotext").value;
     sentimentoResposta = sentimentoResposta.toLowerCase();
+    limparTexto();
+
+    console.log("texto: ", texto);
+    console.log("sentimento: ", sentimentoResposta);
 
     if (!texto || !sentimentoResposta) {
         alert("Texto ou sentimento ausente.");
         return;
     }
-    limparTexto();
 
     try {
         console.log("entrou no try")
