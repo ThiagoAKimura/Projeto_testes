@@ -13,9 +13,9 @@ Há também um botão para visualizar um gráfico de pizza mostrando a proporç�
 
 ## Instalação
 
-Além da instalação do projeto, é necessário instalar essas bibliotecas para o backend:
+Além da instalação do projeto, é necessário instalar essas bibliotecas para o backend:  
 pip install flask flask-cors torch transformers deep-translator sqlalchemy openpyxl pandas matplotlib
 
 # Acesse a pasta
-No terminal, acesse a pasta cd /backend-main e execute o comando python ./app.py
+No terminal, acesse a pasta cd /backend-main e execute o comando python ./app.py.  
 Depois, nas pasta /frontend-main, pelo vscode, acesse a pasta /analise e execute o arquivo analise.html pelo live server, se certifique de que o server inicializou (app.py) antes de começar a testar.
